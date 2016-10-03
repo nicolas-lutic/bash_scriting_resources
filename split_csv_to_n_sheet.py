@@ -9,39 +9,37 @@ from datetime import datetime
 # Definition des des variables temporelles
 #=========================================================================
 
-def cutfile( filename, out_file_name, column_cutting_index ):
+def cutfile( filename, outFileName, columnCuttingIndex ):
 
     if(os.stat(filename).st_size==0):
         return
 
     with open(filename, 'rb') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=';',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        prev_file_name=""
-        b_first_line=True
-        a_column_name=""
+        spamreader = csv.reader(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        prevFileName=""
+        bFirstLine=True
+        aColumnName=""
         wb = xlwt.Workbook()
         rowi = 1
         nb_sheet=0
         for row in spamreader:
-            if (b_first_line):
-                b_first_line=False
-                a_column_name = row
+            if (bFirstLine):
+                bFirstLine=False
+                aColumnName = row
                 continue
-            if (prev_file_name!=row[column_cutting_index]):
+            if (prevFileName!=row[columnCuttingIndex]):
                 #create new sheet
-                sheetname=row[column_cutting_index]
-                if (len(row[column_cutting_index]) > 30 ):
-                    sheetname = row[column_cutting_index][0:25]+str(nb_sheet)
-                prev_file_name=row[column_cutting_index]
+                sheetname=row[columnCuttingIndex]
+                if (len(row[columnCuttingIndex]) > 30 ):
+                    sheetname = row[columnCuttingIndex][0:25]+str(nb_sheet)
+                prevFileName=row[columnCuttingIndex]
                 ws = wb.add_sheet(sheetname)
                 rowi = 1
                 nb_sheet+=1
             for coli, value in enumerate(row):
-                    ws.write(rowi,coli,value)
+                ws.write(rowi,coli,value.decode("utf8"))
             rowi +=1
-        wb.save(out_file_name+".xls")
-                  
-   
+        wb.save(outFileName+".xls")
 
 if __name__ == "__main__":
     if len( sys.argv ) <> 4:
@@ -51,8 +49,3 @@ if __name__ == "__main__":
         sys.exit( 1 )
     else:
         cutfile (sys.argv[1],sys.argv[2],int(sys.argv[3]))
-
-
-#with open(vlogdir+"HCHC-HCHP-"+vDATE+".csv", "a") as hchpfile:  
-  #                               hchpfile.write("'"+vDATE +" "+ vHEURE+"';"+ data["HCHC"]+";"+ data["HCHP"]+"\r\n")
-#=========================================================================
