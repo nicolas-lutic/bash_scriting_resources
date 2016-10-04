@@ -19,11 +19,8 @@ def cutfile( filename, outFileName, columnCuttingIndex ):
         bFirstLine=True
         aColumnName=""
         wb = xlwt.Workbook()
-        rowi = 1
-        nb_sheet=0
         sheetRows={}
         for row in spamreader:
-            print row
             if (bFirstLine):
                 bFirstLine=False
                 aColumnName = row
@@ -39,14 +36,10 @@ def cutfile( filename, outFileName, columnCuttingIndex ):
         for sheetName, rows in sorted(sheetRows.iteritems()):
             ws = wb.add_sheet(sheetName)
             for coli, value in enumerate(aColumnName):
-                ws.write(0,coli,value.decode("utf8"))
-            rowi = 1
-            rows.sort();
+                ws.write(0,coli,value.decode("utf8"))         
             for index, row in enumerate(rows):
                 for coli, value in enumerate(row):
-                    print type(value)
                     ws.write(index+1,coli,value.decode("utf8")) 
-                rowi +=1
 
         wb.save(outFileName+".xls")
 
