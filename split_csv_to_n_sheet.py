@@ -16,29 +16,38 @@ def cutfile( filename, outFileName, columnCuttingIndex ):
 
     with open(filename, 'rb') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        prevFileName=""
         bFirstLine=True
         aColumnName=""
         wb = xlwt.Workbook()
         rowi = 1
         nb_sheet=0
+        sheetRows={}
         for row in spamreader:
+            print row
             if (bFirstLine):
                 bFirstLine=False
                 aColumnName = row
                 continue
-            if (prevFileName!=row[columnCuttingIndex]):
-                #create new sheet
-                sheetname=row[columnCuttingIndex]
-                if (len(row[columnCuttingIndex]) > 30 ):
-                    sheetname = row[columnCuttingIndex][0:25]+str(nb_sheet)
-                prevFileName=row[columnCuttingIndex]
-                ws = wb.add_sheet(sheetname)
-                rowi = 1
-                nb_sheet+=1
-            for coli, value in enumerate(row):
-                ws.write(rowi,coli,value.decode("utf8"))
-            rowi +=1
+            sheetName=row[columnCuttingIndex]
+            # this limit is from the max size of a sheetName
+            if (len(row[columnCuttingIndex]) > 30 ):
+                sheetName = row[columnCuttingIndex][0:25]+str(nb_sheet)
+            if(sheetRows.has_key(sheetName)==False):
+                  sheetRows[sheetName]=[]
+            sheetRows[sheetName].append(row)
+        
+        for sheetName, rows in sorted(sheetRows.iteritems()):
+            ws = wb.add_sheet(sheetName)
+            for coli, value in enumerate(aColumnName):
+                ws.write(0,coli,value.decode("utf8"))
+            rowi = 1
+            rows.sort();
+            for index, row in enumerate(rows):
+                for coli, value in enumerate(row):
+                    print type(value)
+                    ws.write(index+1,coli,value.decode("utf8")) 
+                rowi +=1
+
         wb.save(outFileName+".xls")
 
 if __name__ == "__main__":
